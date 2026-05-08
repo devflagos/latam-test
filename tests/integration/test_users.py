@@ -33,8 +33,11 @@ async def mock_user_repository():
             return User(**user_data)
         return None
 
-    async def mock_find_all():
-        return [User(**u) for u in users_db.values()]
+    async def mock_find_all(active_only=True, limit=50, offset=0):
+        users = [User(**u) for u in users_db.values()]
+        if active_only:
+            users = [u for u in users if u.active]
+        return users[offset : offset + limit]
 
     async def mock_find_by_username(username):
         for u in users_db.values():

@@ -135,9 +135,13 @@ class TestUserService:
             last_name="User",
             active=False,
         )
-        mock_user_repository.find_all = AsyncMock(
-            return_value=[sample_user, inactive_user]
-        )
+
+        async def mock_find_all(active_only=True, limit=50, offset=0):
+            if active_only:
+                return [sample_user]
+            return [sample_user, inactive_user]
+
+        mock_user_repository.find_all = AsyncMock(side_effect=mock_find_all)
 
         service = UserService(mock_user_repository)
         result = await service.list_users(active_only=True)
@@ -154,9 +158,13 @@ class TestUserService:
             last_name="User",
             active=False,
         )
-        mock_user_repository.find_all = AsyncMock(
-            return_value=[sample_user, inactive_user]
-        )
+
+        async def mock_find_all(active_only=True, limit=50, offset=0):
+            if active_only:
+                return [sample_user]
+            return [sample_user, inactive_user]
+
+        mock_user_repository.find_all = AsyncMock(side_effect=mock_find_all)
 
         service = UserService(mock_user_repository)
         result = await service.list_users(active_only=False)
@@ -165,7 +173,10 @@ class TestUserService:
 
     @pytest.mark.asyncio
     async def test_list_users_empty(self, mock_user_repository):
-        mock_user_repository.find_all = AsyncMock(return_value=[])
+        async def mock_find_all(active_only=True, limit=50, offset=0):
+            return []
+
+        mock_user_repository.find_all = AsyncMock(side_effect=mock_find_all)
 
         service = UserService(mock_user_repository)
         result = await service.list_users()

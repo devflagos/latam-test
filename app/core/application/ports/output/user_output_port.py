@@ -14,7 +14,9 @@ class UserOutputPort(ABC):
         pass
 
     @abstractmethod
-    async def find_all(self) -> list[User]:
+    async def find_all(
+        self, active_only: bool = True, limit: int = 50, offset: int = 0
+    ) -> list[User]:
         pass
 
     @abstractmethod

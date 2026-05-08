@@ -40,8 +40,16 @@ async def get_user(user_id: UUID):
 
 
 @router.get("", response_model=list[UserResponse])
-async def list_users(active_only: bool = True):
-    users = await user_service.list_users(active_only=active_only)
+async def list_users(active_only: bool = True, limit: int = 50, offset: int = 0):
+    if limit > 100:
+        limit = 100
+    if limit < 1:
+        limit = 1
+    if offset < 0:
+        offset = 0
+    users = await user_service.list_users(
+        active_only=active_only, limit=limit, offset=offset
+    )
     return [UserResponse.model_validate(user) for user in users]
 
 
