@@ -12,20 +12,20 @@ class ApplicationService:
 
 
 class CreateUseCase(ApplicationService, InputPort):
-    def execute(self, entity):
-        return self._repository.save(entity)
+    async def execute(self, entity):
+        return await self._repository.save(entity)
 
 
 class FindByIdUseCase(ApplicationService, InputPort):
-    def execute(self, id: str):
-        return self._repository.find_by_id(id)
+    async def execute(self, id: str):
+        return await self._repository.find_by_id(id)
 
 
 class FindAllUseCase(ApplicationService, InputPort):
-    def execute(self):
-        return self._repository.find_all()
+    async def execute(self):
+        return await self._repository.find_all()
 
 
 class DeleteUseCase(ApplicationService, InputPort):
-    def execute(self, id: str) -> bool:
-        return self._repository.delete(id)
+    async def execute(self, id: str) -> bool:
+        return await self._repository.delete(id)

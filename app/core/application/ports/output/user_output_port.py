@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 from uuid import UUID
 
 from app.core.domain.entities.user import User
@@ -11,7 +10,7 @@ class UserOutputPort(ABC):
         pass
 
     @abstractmethod
-    async def find_by_id(self, id: UUID) -> Optional[User]:
+    async def find_by_id(self, id: UUID) -> User | None:
         pass
 
     @abstractmethod
@@ -19,11 +18,11 @@ class UserOutputPort(ABC):
         pass
 
     @abstractmethod
-    async def find_by_username(self, username: str) -> Optional[User]:
+    async def find_by_username(self, username: str) -> User | None:
         pass
 
     @abstractmethod
-    async def find_by_email(self, email: str) -> Optional[User]:
+    async def find_by_email(self, email: str) -> User | None:
         pass
 
     @abstractmethod

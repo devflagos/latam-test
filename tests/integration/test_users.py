@@ -1,11 +1,98 @@
+from unittest.mock import MagicMock
+from uuid import uuid4
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
+from app.core.domain.entities.user import User
 from app.main import app
 
 
 @pytest.fixture
-async def client():
+async def mock_user_repository():
+    repo = MagicMock()
+    users_db = {}
+
+    async def mock_save(user):
+        user_id = user.id or uuid4()
+        user_data = {
+            "id": user_id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "role": user.role.value if hasattr(user.role, "value") else user.role,
+            "active": user.active,
+        }
+        users_db[str(user_id)] = user_data
+        return User(**user_data)
+
+    async def mock_find_by_id(user_id):
+        user_data = users_db.get(str(user_id))
+        if user_data:
+            return User(**user_data)
+        return None
+
+    async def mock_find_all():
+        return [User(**u) for u in users_db.values()]
+
+    async def mock_find_by_username(username):
+        for u in users_db.values():
+            if u["username"] == username:
+                return User(**u)
+        return None
+
+    async def mock_find_by_email(email):
+        for u in users_db.values():
+            if u["email"] == email:
+                return User(**u)
+        return None
+
+    async def mock_update(user):
+        user_id = str(user.id)
+        if user_id in users_db:
+            role = user.role.value if hasattr(user.role, "value") else user.role
+            users_db[user_id].update(
+                {
+                    "username": user.username,
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "role": role,
+                    "active": user.active,
+                }
+            )
+        return User(**users_db[user_id])
+
+    async def mock_delete(user_id):
+        if str(user_id) in users_db:
+            del users_db[str(user_id)]
+            return True
+        return False
+
+    repo.save = mock_save
+    repo.find_by_id = mock_find_by_id
+    repo.find_all = mock_find_all
+    repo.find_by_username = mock_find_by_username
+    repo.find_by_email = mock_find_by_email
+    repo.update = mock_update
+    repo.delete = mock_delete
+    return repo
+
+
+@pytest.fixture
+async def client(mock_user_repository):
+    from app.api.v1.users import user_repository, user_service
+
+    user_repository.save = mock_user_repository.save
+    user_repository.find_by_id = mock_user_repository.find_by_id
+    user_repository.find_all = mock_user_repository.find_all
+    user_repository.find_by_username = mock_user_repository.find_by_username
+    user_repository.find_by_email = mock_user_repository.find_by_email
+    user_repository.update = mock_user_repository.update
+    user_repository.delete = mock_user_repository.delete
+    user_service._repository = mock_user_repository
+
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
@@ -99,9 +186,7 @@ async def test_get_user_by_id(client):
 
 @pytest.mark.asyncio
 async def test_get_user_not_found(client):
-    response = await client.get(
-        "/users/00000000-0000-0000-0000-000000000000"
-    )
+    response = await client.get("/users/00000000-0000-0000-0000-000000000000")
     assert response.status_code == 404
 
 

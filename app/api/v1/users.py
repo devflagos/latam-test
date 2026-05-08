@@ -24,7 +24,9 @@ async def create_user(data: UserCreate):
         return UserResponse.model_validate(user)
     except ValueError as e:
         logger.warning(f"User creation failed: {e}")
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
 
 
 @router.get("/{user_id}", response_model=UserResponse)
@@ -50,8 +52,12 @@ async def update_user(user_id: UUID, data: UserUpdate):
         return UserResponse.model_validate(user)
     except ValueError as e:
         if "not found" in str(e):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+            ) from e
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
 
 
 @router.delete("/{user_id}", response_model=UserResponse)
@@ -61,5 +67,9 @@ async def delete_user(user_id: UUID):
         return UserResponse.model_validate(user)
     except ValueError as e:
         if "not found" in str(e):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+            ) from e
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e

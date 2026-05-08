@@ -1,5 +1,4 @@
 from uuid import uuid4
-import pytest
 
 from app.core.domain.entities.entity import Entity
 from app.core.domain.entities.user import User, UserRole

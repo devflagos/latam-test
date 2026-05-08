@@ -1,7 +1,7 @@
-import time
 import logging
+import time
 from collections import defaultdict
-from typing import Callable
+from collections.abc import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -18,7 +18,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.period = period
         self.clients: dict = defaultdict(list)
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:  # type: ignore[type-arg]
         client_ip = request.client.host if request.client else "unknown"
         current_time = time.time()
 
@@ -35,4 +35,5 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             )
 
         self.clients[client_ip].append(current_time)
-        return await call_next(request)
+        response: Response = await call_next(request)  # type: ignore[assignment]
+        return response

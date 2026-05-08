@@ -37,13 +37,13 @@ class UserModel(Base):
 
     def to_domain(self) -> "User":
         return User(
-            id=self.id,
-            username=self.username,
-            email=self.email,
-            first_name=self.first_name,
-            last_name=self.last_name,
-            role=UserRole(self.role),
-            active=self.active,
+            id=self.id,  # type: ignore[arg-type]
+            username=self.username,  # type: ignore[arg-type]
+            email=self.email,  # type: ignore[arg-type]
+            first_name=self.first_name,  # type: ignore[arg-type]
+            last_name=self.last_name,  # type: ignore[arg-type]
+            role=UserRole(self.role),  # type: ignore[arg-type]
+            active=self.active,  # type: ignore[arg-type]
         )
 
     @classmethod

@@ -2,8 +2,8 @@ import pytest
 from pydantic import ValidationError
 
 from app.api.v1.schemas.user_create import UserCreate
-from app.api.v1.schemas.user_update import UserUpdate
 from app.api.v1.schemas.user_response import UserResponse
+from app.api.v1.schemas.user_update import UserUpdate
 from app.core.domain.entities.user import UserRole
 
 
