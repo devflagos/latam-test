@@ -3,7 +3,6 @@ from uuid import UUID
 
 from sqlalchemy import delete as sql_delete
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.application.ports.output.user_output_port import UserOutputPort
 from app.core.domain.entities.user import User
@@ -16,10 +15,6 @@ logger = logging.getLogger(__name__)
 class UserRepository(UserOutputPort):
     def __init__(self) -> None:
         self.session_maker = async_session_maker
-
-    async def _get_session(self) -> AsyncSession:  # type: ignore[misc]
-        async with self.session_maker() as session:
-            yield session
 
     async def save(self, user: User) -> User:
         async with self.session_maker() as session:
@@ -71,12 +66,18 @@ class UserRepository(UserOutputPort):
                 select(UserModel).where(UserModel.id == user.id)
             )
             model = result.scalar_one()
-            model.username = user.username  # type: ignore[assignment]
-            model.email = user.email  # type: ignore[assignment]
-            model.first_name = user.first_name  # type: ignore[assignment]
-            model.last_name = user.last_name  # type: ignore[assignment]
-            model.role = user.role.value  # type: ignore[assignment]
-            model.active = user.active  # type: ignore[assignment]
+            model_username: str = user.username
+            model_email: str = user.email
+            model_first_name: str = user.first_name
+            model_last_name: str = user.last_name
+            model_role: str = user.role.value
+            model_active: bool = user.active
+            model.username = model_username
+            model.email = model_email
+            model.first_name = model_first_name
+            model.last_name = model_last_name
+            model.role = model_role
+            model.active = model_active
             await session.commit()
             await session.refresh(model)
             logger.info(f"User updated: {model.id}")

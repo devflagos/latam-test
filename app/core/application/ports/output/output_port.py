@@ -1,20 +1,17 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
-
-T = TypeVar("T")
 
 
-class OutputPort(ABC, Generic[T]):  # type: ignore[misc]
+class OutputPort(ABC):
     @abstractmethod
-    async def save(self, entity: T) -> T:
+    async def save(self, entity: object) -> object:
         pass
 
     @abstractmethod
-    async def find_by_id(self, id: str) -> T | None:
+    async def find_by_id(self, id: str) -> object | None:
         pass
 
     @abstractmethod
-    async def find_all(self) -> list[T]:
+    async def find_all(self) -> list[object]:
         pass
 
     @abstractmethod

@@ -1,6 +1,6 @@
 import logging
 import time
-from collections.abc import Callable
+from typing import Protocol
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -8,10 +8,14 @@ from starlette.middleware.base import BaseHTTPMiddleware
 logger = logging.getLogger(__name__)
 
 
+class CallNext(Protocol):
+    async def __call__(self, request: Request) -> Response: ...
+
+
 class LoggingMiddleware(BaseHTTPMiddleware):
     """Middleware to log requests and responses."""
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:  # type: ignore[type-arg]
+    async def dispatch(self, request: Request, call_next: CallNext) -> Response:
         start_time = time.time()
 
         client_host = request.client.host if request.client else "unknown"
@@ -19,7 +23,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             f"Request: {request.method} {request.url.path} " f"client={client_host}"
         )
 
-        response: Response = await call_next(request)  # type: ignore[assignment]
+        response = await call_next(request)
 
         duration = time.time() - start_time
         logger.info(

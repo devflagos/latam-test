@@ -22,7 +22,7 @@ async_session_maker = async_sessionmaker(
 )
 
 
-async def get_session() -> AsyncSession:  # type: ignore[misc]
+async def get_session() -> AsyncSession:
     async with async_session_maker() as session:
         yield session
 

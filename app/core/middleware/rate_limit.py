@@ -1,7 +1,7 @@
 import logging
 import time
 from collections import defaultdict
-from collections.abc import Callable
+from typing import Any, Protocol
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -9,16 +9,20 @@ from starlette.middleware.base import BaseHTTPMiddleware
 logger = logging.getLogger(__name__)
 
 
+class CallNext(Protocol):
+    async def __call__(self, request: Request) -> Response: ...
+
+
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Rate limiting middleware to prevent abuse."""
 
-    def __init__(self, app: Callable, calls: int = 60, period: int = 60):
+    def __init__(self, app: Any, calls: int = 60, period: int = 60):
         super().__init__(app)
         self.calls = calls
         self.period = period
         self.clients: dict = defaultdict(list)
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:  # type: ignore[type-arg]
+    async def dispatch(self, request: Request, call_next: CallNext) -> Response:
         client_ip = request.client.host if request.client else "unknown"
         current_time = time.time()
 
@@ -35,5 +39,5 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             )
 
         self.clients[client_ip].append(current_time)
-        response: Response = await call_next(request)  # type: ignore[assignment]
+        response = await call_next(request)
         return response
