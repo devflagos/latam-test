@@ -168,10 +168,9 @@ uv run alembic upgrade head
 - **No authentication/JWT**: Currently no auth implemented. Add pyJWT for production.
 - **No email verification**: User emails aren't verified.
 - **Soft delete only**: Deleted users are marked inactive, not hard deleted.
-- **No rate limiting UI**: Consider adding admin dashboard for rate limit config.
 - **Add security code scanning**: Add security code scanning to the project, with tools like SonarQube and Checkmarx.
-- **Add monitoring** Add monitoring using cloudwatch, with logs, metrics, traces and alerts.
-- **Add CI/CD** Add CI/CD pipeline using GitHub Actions, to run tests, security code scanning and deployment to Google Cloud Run.
+- **Add monitoring**: Add monitoring using CloudWatch, with logs, metrics, traces and alerts.
+- **Add CI/CD**: Add CI/CD pipeline using GitHub Actions, to run tests, security code scanning and deployment to Google Cloud Run.
 
 ## Tech Stack
 
