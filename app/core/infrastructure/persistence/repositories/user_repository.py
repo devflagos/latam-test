@@ -31,9 +31,15 @@ class UserRepository(UserOutputPort):
             model = result.scalar_one_or_none()
             return model.to_domain() if model else None
 
-    async def find_all(self) -> list[User]:
+    async def find_all(
+        self, active_only: bool = True, limit: int = 50, offset: int = 0
+    ) -> list[User]:
         async with self.session_maker() as session:
-            result = await session.execute(select(UserModel))
+            stmt = select(UserModel)
+            if active_only:
+                stmt = stmt.where(UserModel.active)
+            stmt = stmt.limit(limit).offset(offset)
+            result = await session.execute(stmt)
             models = result.scalars().all()
             return [model.to_domain() for model in models]
 

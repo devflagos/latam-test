@@ -39,11 +39,12 @@ class UserService:
     async def get_user(self, user_id: UUID) -> User | None:
         return await self._repository.find_by_id(user_id)
 
-    async def list_users(self, active_only: bool = True) -> list[User]:
-        all_users = await self._repository.find_all()
-        if active_only:
-            return [user for user in all_users if user.active]
-        return all_users
+    async def list_users(
+        self, active_only: bool = True, limit: int = 50, offset: int = 0
+    ) -> list[User]:
+        return await self._repository.find_all(
+            active_only=active_only, limit=limit, offset=offset
+        )
 
     async def update_user(self, user_id: UUID, data: UserUpdate) -> User:
         user = await self._repository.find_by_id(user_id)
