@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, Optional, TypeVar
 
 T = TypeVar("T")
 
@@ -10,7 +10,7 @@ class OutputPort(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    async def find_by_id(self, id: str) -> T | None:
+    async def find_by_id(self, id: str) -> Optional[T]:
         pass
 
     @abstractmethod

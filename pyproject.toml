@@ -1,17 +1,19 @@
 [project]
-name = "users-latam"
+name = "test-latam"
 version = "0.1.0"
-description = "User Management API for Latam Technical Assessment"
+description = "FastAPI hexagonal architecture project"
 requires-python = ">=3.11"
 dependencies = [
-    "fastapi>=0.115.0",
+    "fastapi>=0.109.0",
     "uvicorn[standard]>=0.27.0",
     "sqlalchemy>=2.0.25",
     "asyncpg>=0.29.0",
     "greenlet>=3.0.0",
+    "alembic>=1.14.0",
     "pydantic>=2.5.0",
     "pydantic-settings>=2.1.0",
     "python-dotenv>=1.0.0",
+    "email-validator>=2.0.0",
 ]
 
 [project.optional-dependencies]
@@ -23,13 +25,13 @@ dev = [
 ]
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {}
+packages = ["app"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-v --tb=short"
