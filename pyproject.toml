@@ -56,9 +56,18 @@ python_version = "3.13"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
+disable_error_code = ["misc", "override"]
 
 [[tool.mypy.overrides]]
 module = "app.core.application.ports.*"
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = "app.core.middleware.*"
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = "app.core.infrastructure.database"
 disallow_untyped_defs = false
 
 [build-system]

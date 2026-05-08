@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Generic, TypeVar
-
-T = TypeVar("T")
+from typing import Any
 
 
-class InputPort(ABC, Generic[T]):  # type: ignore[misc]
+class InputPort(ABC):
     @abstractmethod
-    def execute(self, *args: Any, **kwargs: Any) -> T:
+    def execute(self, *args: Any, **kwargs: Any) -> Any:
         pass

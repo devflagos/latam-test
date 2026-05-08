@@ -15,39 +15,39 @@ class UserModel(Base):
     id: Mapped[PG_UUID] = mapped_column(
         PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    created_at: Mapped[DateTime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.now
     )
-    updated_at: Mapped[DateTime] = mapped_column(
+    updated_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.now, onupdate=datetime.now
     )
 
-    username: Mapped[String] = mapped_column(
+    username: Mapped[str] = mapped_column(
         String(50), unique=True, nullable=False, index=True
     )
-    email: Mapped[String] = mapped_column(
+    email: Mapped[str] = mapped_column(
         String(255), unique=True, nullable=False, index=True
     )
-    first_name: Mapped[String] = mapped_column(String(100), nullable=False)
-    last_name: Mapped[String] = mapped_column(String(100), nullable=False)
-    role: Mapped[String] = mapped_column(
+    first_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    role: Mapped[str] = mapped_column(
         String(20), nullable=False, default=UserRole.USER.value
     )
-    active: Mapped[Boolean] = mapped_column(Boolean, nullable=False, default=True)
+    active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    def to_domain(self) -> "User":
+    def to_domain(self) -> User:
         return User(
-            id=self.id,  # type: ignore[arg-type]
-            username=self.username,  # type: ignore[arg-type]
-            email=self.email,  # type: ignore[arg-type]
-            first_name=self.first_name,  # type: ignore[arg-type]
-            last_name=self.last_name,  # type: ignore[arg-type]
-            role=UserRole(self.role),  # type: ignore[arg-type]
-            active=self.active,  # type: ignore[arg-type]
+            id=uuid.UUID(str(self.id)) if self.id else None,
+            username=str(self.username),
+            email=str(self.email),
+            first_name=str(self.first_name),
+            last_name=str(self.last_name),
+            role=UserRole(self.role),
+            active=bool(self.active),
         )
 
     @classmethod
-    def from_domain(cls, user: "User") -> "UserModel":
+    def from_domain(cls, user: User) -> "UserModel":
         return cls(
             id=user.id,
             username=user.username,
