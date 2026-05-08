@@ -40,8 +40,11 @@ class UserService:
     async def get_user(self, user_id: UUID) -> Optional[User]:
         return await self._repository.find_by_id(user_id)
 
-    async def list_users(self) -> list[User]:
-        return await self._repository.find_all()
+    async def list_users(self, active_only: bool = True) -> list[User]:
+        all_users = await self._repository.find_all()
+        if active_only:
+            return [user for user in all_users if user.active]
+        return all_users
 
     async def update_user(self, user_id: UUID, data: UserUpdate) -> User:
         user = await self._repository.find_by_id(user_id)
@@ -76,3 +79,10 @@ class UserService:
         if not user:
             raise ValueError(f"User with id '{user_id}' not found")
         return await self._repository.delete(user_id)
+
+    async def deactivate_user(self, user_id: UUID) -> User:
+        user = await self._repository.find_by_id(user_id)
+        if not user:
+            raise ValueError(f"User with id '{user_id}' not found")
+        user.deactivate()
+        return await self._repository.update(user)

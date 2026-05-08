@@ -38,8 +38,8 @@ async def get_user(user_id: UUID):
 
 
 @router.get("", response_model=list[UserResponse])
-async def list_users():
-    users = await user_service.list_users()
+async def list_users(active_only: bool = True):
+    users = await user_service.list_users(active_only=active_only)
     return [UserResponse.model_validate(user) for user in users]
 
 
@@ -54,10 +54,11 @@ async def update_user(user_id: UUID, data: UserUpdate):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}", response_model=UserResponse)
 async def delete_user(user_id: UUID):
     try:
-        await user_service.delete_user(user_id)
+        user = await user_service.deactivate_user(user_id)
+        return UserResponse.model_validate(user)
     except ValueError as e:
         if "not found" in str(e):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
