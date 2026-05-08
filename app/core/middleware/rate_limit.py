@@ -1,0 +1,38 @@
+import time
+import logging
+from collections import defaultdict
+from typing import Callable
+
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+
+logger = logging.getLogger(__name__)
+
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    """Rate limiting middleware to prevent abuse."""
+
+    def __init__(self, app: Callable, calls: int = 60, period: int = 60):
+        super().__init__(app)
+        self.calls = calls
+        self.period = period
+        self.clients: dict = defaultdict(list)
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        client_ip = request.client.host if request.client else "unknown"
+        current_time = time.time()
+
+        self.clients[client_ip] = [
+            t for t in self.clients[client_ip] if current_time - t <= self.period
+        ]
+
+        if len(self.clients[client_ip]) >= self.calls:
+            logger.warning(f"Rate limit exceeded for {client_ip}")
+            return Response(
+                content="Rate limit exceeded",
+                status_code=429,
+                headers={"Retry-After": str(self.period)},
+            )
+
+        self.clients[client_ip].append(current_time)
+        return await call_next(request)

@@ -7,6 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.core.infrastructure.database import init_db, close_db
 from app.core.infrastructure.adapters.primary.health import health_router
+from app.core.middleware.rate_limit import RateLimitMiddleware
+from app.core.middleware.logging import LoggingMiddleware
 from app.api.v1.users import router as users_router
 
 logger = logging.getLogger(__name__)
@@ -38,6 +40,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(LoggingMiddleware)
+app.add_middleware(RateLimitMiddleware, calls=60, period=60)
 
 app.include_router(health_router)
 app.include_router(users_router)
