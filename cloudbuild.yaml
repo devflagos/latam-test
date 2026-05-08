@@ -1,0 +1,84 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "southamerica-west1-docker.pkg.dev/$PROJECT_ID/${_SERVICE_NAME}/$COMMIT_SHA",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "southamerica-west1-docker.pkg.dev/$PROJECT_ID/${_SERVICE_NAME}/$COMMIT_SHA",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "run"
+      - "--rm"
+      - "-v"
+      - "/workspace:/workspace"
+      - "-w"
+      - "/workspace"
+      - "southamerica-west1-docker.pkg.dev/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"
+      - "python"
+      - "-m"
+      - "pytest"
+      - "-v"
+      - "-x"
+      - "tests/"
+    env:
+      - "DATABASE_URL=${_DATABASE_URL}"
+      - "SECRET_KEY=${_SECRET_KEY}"
+      - "ENV=prod"
+
+  - name: "gcr.io/google.com/cloudsdkdocker/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "deploy"
+      - "${_SERVICE_NAME}"
+      - "--image"
+      - "southamerica-west1-docker.pkg.dev/$PROJECT_ID/${_SERVICE_NAME}/$COMMIT_SHA"
+      - "--region"
+      - "${_REGION}"
+      - "--platform"
+      - "managed"
+      - "--allow-unauthenticated"
+      - "--set-env-vars"
+      - "DATABASE_HOST=${_DATABASE_HOST},DATABASE_PORT=${_DATABASE_PORT},DATABASE_USER=${_DATABASE_USER},DATABASE_PASSWORD=${_DATABASE_PASSWORD},DATABASE_NAME=${_DATABASE_NAME},ENV=prod"
+      - "--service-account"
+      - "${_SERVICE_ACCOUNT}"
+      - "--cloudsql-instances"
+      - "${_CLOUDSQL_CONNECTION}"
+      - "--memory"
+      - "512Mi"
+      - "--cpu"
+      - "1"
+      - "--max-instances"
+      - "3"
+
+images:
+  - "southamerica-west1-docker.pkg.dev/$PROJECT_ID/${_SERVICE_NAME}/$COMMIT_SHA"
+
+substitutions:
+  _REGION: southamerica-west1
+  _SERVICE_NAME: ${_API_NAME}
+  _DATABASE_HOST: ${_DATABASE_HOST}
+  _DATABASE_PORT: ${_DATABASE_PORT}
+  _DATABASE_USER: ${_DATABASE_USER}
+  _DATABASE_PASSWORD: ${_DATABASE_PASSWORD}
+  _DATABASE_NAME: ${_DATABASE_NAME}
+  _CLOUDSQL_CONNECTION: ${_CLOUDSQL_CONNECTION}
+  _SERVICE_ACCOUNT: ${_SERVICE_ACCOUNT}
+  _DATABASE_URL: ${_DATABASE_URL}
+  _SECRET_KEY: ${_SECRET_KEY}
+
+options:
+  env:
+    - "PYTHONUNBUFFERED=1"
+
+logsBucket: "gs://${PROJECT_ID}_cloudbuild_logs"
