@@ -1,2 +1,1 @@
-# latam-test
-latam assesment for software engineer
+# User Management API for Latam Technical Assessment
