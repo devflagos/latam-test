@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 from uuid import UUID
 
 from app.api.v1.schemas.user_create import UserCreate
@@ -37,7 +36,7 @@ class UserService:
         )
         return await self._repository.save(user)
 
-    async def get_user(self, user_id: UUID) -> Optional[User]:
+    async def get_user(self, user_id: UUID) -> User | None:
         return await self._repository.find_by_id(user_id)
 
     async def list_users(self, active_only: bool = True) -> list[User]:

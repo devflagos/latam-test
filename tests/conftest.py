@@ -1,7 +1,7 @@
-import pytest
-import pytest_asyncio
 from unittest.mock import MagicMock
 from uuid import uuid4
+
+import pytest
 
 from app.core.domain.entities.user import User, UserRole
 
@@ -40,6 +40,7 @@ def mock_user_repository():
 @pytest.fixture
 def user_create_data():
     from app.api.v1.schemas.user_create import UserCreate
+
     return UserCreate(
         username="newuser",
         email="new@example.com",
@@ -51,4 +52,5 @@ def user_create_data():
 @pytest.fixture
 def user_update_data():
     from app.api.v1.schemas.user_update import UserUpdate
+
     return UserUpdate(first_name="Updated", last_name="Name")

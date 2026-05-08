@@ -1,12 +1,12 @@
 from unittest.mock import AsyncMock, MagicMock
-
-import pytest
 from uuid import uuid4
 
-from app.core.application.services.user_service import UserService
-from app.core.domain.entities.user import User, UserRole
+import pytest
+
 from app.api.v1.schemas.user_create import UserCreate
 from app.api.v1.schemas.user_update import UserUpdate
+from app.core.application.services.user_service import UserService
+from app.core.domain.entities.user import User, UserRole
 
 
 class TestUserService:
@@ -222,12 +222,14 @@ class TestUserService:
         mock_user_repository.update = AsyncMock(return_value=sample_user)
 
         service = UserService(mock_user_repository)
-        result = await service.deactivate_user(sample_user.id)
+        await service.deactivate_user(sample_user.id)
 
         mock_user_repository.update.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_deactivate_user_not_found(self, mock_user_repository, sample_user_id):
+    async def test_deactivate_user_not_found(
+        self, mock_user_repository, sample_user_id
+    ):
         mock_user_repository.find_by_id = AsyncMock(return_value=None)
 
         service = UserService(mock_user_repository)

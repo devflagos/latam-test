@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 from uuid import UUID
 
 from app.core.domain.entities.entity import Entity
@@ -20,7 +19,7 @@ class User(Entity):
         last_name: str,
         role: UserRole = UserRole.USER,
         active: bool = True,
-        id: Optional[UUID] = None,
+        id: UUID | None = None,
     ) -> None:
         super().__init__(id)
         self._username = username
@@ -56,12 +55,12 @@ class User(Entity):
 
     def update(
         self,
-        username: Optional[str] = None,
-        email: Optional[str] = None,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        role: Optional[UserRole] = None,
-        active: Optional[bool] = None,
+        username: str | None = None,
+        email: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        role: UserRole | None = None,
+        active: bool | None = None,
     ) -> None:
         if username is not None:
             self._username = username

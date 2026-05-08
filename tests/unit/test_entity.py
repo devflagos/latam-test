@@ -1,7 +1,4 @@
 from uuid import uuid4
-from datetime import datetime
-
-import pytest
 
 from app.core.domain.entities.entity import Entity
 

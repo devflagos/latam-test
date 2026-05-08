@@ -1,10 +1,10 @@
-from typing import Any, Optional
-from uuid import UUID, uuid4
 from datetime import datetime
+from typing import Any
+from uuid import UUID, uuid4
 
 
 class Entity:
-    def __init__(self, id: Optional[UUID] = None) -> None:
+    def __init__(self, id: UUID | None = None) -> None:
         self._id = id if id is not None else uuid4()
         self._created_at = datetime.now()
         self._updated_at = datetime.now()

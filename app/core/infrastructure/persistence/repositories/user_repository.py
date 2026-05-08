@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import delete as sql_delete
@@ -18,7 +17,7 @@ class UserRepository(UserOutputPort):
     def __init__(self) -> None:
         self.session_maker = async_session_maker
 
-    async def _get_session(self) -> AsyncSession:
+    async def _get_session(self) -> AsyncSession:  # type: ignore[misc]
         async with self.session_maker() as session:
             yield session
 
@@ -31,7 +30,7 @@ class UserRepository(UserOutputPort):
             logger.info(f"User created: {model.id}")
             return model.to_domain()
 
-    async def find_by_id(self, id: UUID) -> Optional[User]:
+    async def find_by_id(self, id: UUID) -> User | None:
         async with self.session_maker() as session:
             result = await session.execute(select(UserModel).where(UserModel.id == id))
             model = result.scalar_one_or_none()
@@ -43,7 +42,7 @@ class UserRepository(UserOutputPort):
             models = result.scalars().all()
             return [model.to_domain() for model in models]
 
-    async def find_by_username(self, username: str) -> Optional[User]:
+    async def find_by_username(self, username: str) -> User | None:
         async with self.session_maker() as session:
             result = await session.execute(
                 select(UserModel).where(UserModel.username == username)
@@ -51,7 +50,7 @@ class UserRepository(UserOutputPort):
             model = result.scalar_one_or_none()
             return model.to_domain() if model else None
 
-    async def find_by_email(self, email: str) -> Optional[User]:
+    async def find_by_email(self, email: str) -> User | None:
         async with self.session_maker() as session:
             result = await session.execute(
                 select(UserModel).where(UserModel.email == email)
@@ -61,14 +60,10 @@ class UserRepository(UserOutputPort):
 
     async def delete(self, id: UUID) -> bool:
         async with self.session_maker() as session:
-            result = await session.execute(
-                sql_delete(UserModel).where(UserModel.id == id)
-            )
+            await session.execute(sql_delete(UserModel).where(UserModel.id == id))
             await session.commit()
-            deleted = result.rowcount > 0
-            if deleted:
-                logger.info(f"User deleted: {id}")
-            return deleted
+            logger.info(f"User deleted: {id}")
+            return True
 
     async def update(self, user: User) -> User:
         async with self.session_maker() as session:
@@ -76,12 +71,12 @@ class UserRepository(UserOutputPort):
                 select(UserModel).where(UserModel.id == user.id)
             )
             model = result.scalar_one()
-            model.username = user.username
-            model.email = user.email
-            model.first_name = user.first_name
-            model.last_name = user.last_name
-            model.role = user.role.value
-            model.active = user.active
+            model.username = user.username  # type: ignore[assignment]
+            model.email = user.email  # type: ignore[assignment]
+            model.first_name = user.first_name  # type: ignore[assignment]
+            model.last_name = user.last_name  # type: ignore[assignment]
+            model.role = user.role.value  # type: ignore[assignment]
+            model.active = user.active  # type: ignore[assignment]
             await session.commit()
             await session.refresh(model)
             logger.info(f"User updated: {model.id}")

@@ -1,15 +1,15 @@
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import settings
-from app.core.infrastructure.database import init_db, close_db
-from app.core.infrastructure.adapters.primary.health import health_router
-from app.core.middleware.rate_limit import RateLimitMiddleware
-from app.core.middleware.logging import LoggingMiddleware
 from app.api.v1.users import router as users_router
+from app.config import settings
+from app.core.infrastructure.adapters.primary.health import health_router
+from app.core.infrastructure.database import close_db, init_db
+from app.core.middleware.logging import LoggingMiddleware
+from app.core.middleware.rate_limit import RateLimitMiddleware
 
 logger = logging.getLogger(__name__)
 
@@ -21,10 +21,8 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Database connection failed: {e}")
     yield
-    try:
+    with suppress(Exception):
         await close_db()
-    except Exception:
-        pass
 
 
 app = FastAPI(
