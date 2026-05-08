@@ -7,7 +7,7 @@ services:
       - "8000:8000"
     environment:
       - ENV=prod
-      - DATABASE_HOST=postgres
+      - DATABASE_HOST=localhost
       - DATABASE_PORT=5432
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres

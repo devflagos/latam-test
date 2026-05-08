@@ -15,6 +15,15 @@ class UserUpdate(BaseModel):
         None, min_length=1, max_length=100, description="User's last name"
     )
     role: UserRole | None = Field(None, description="User role")
+
+    @field_validator("role", mode="before")
+    @classmethod
+    def normalize_role(cls, v: UserRole | str | None) -> UserRole | None:
+        if v is None:
+            return None
+        if isinstance(v, str):
+            return UserRole(v.lower())
+        return v
     active: bool | None = Field(None, description="Whether user is active")
 
     @field_validator("username")

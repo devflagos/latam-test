@@ -1,5 +1,7 @@
 import logging
+import os
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -9,9 +11,16 @@ logging.basicConfig(
 )
 
 
+def _get_env_file() -> Path | None:
+    env = os.getenv("ENV", "dev").lower()
+    if env in ("dev", "develop", "local"):
+        return Path(__file__).parent.parent / ".env"
+    return None
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_get_env_file(),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -24,7 +33,7 @@ class Settings(BaseSettings):
     database_host: str = "localhost"
     database_port: int = 5432
     database_user: str = "postgres"
-    database_password: str = "postgres"
+    database_password: str = ""
     database_name: str = "test_latam"
 
     base_url: str = "http://localhost:8000"
