@@ -15,6 +15,13 @@ class UserCreate(BaseModel):
         ..., min_length=1, max_length=100, description="User's last name"
     )
     role: UserRole = Field(default=UserRole.USER, description="User role")
+
+    @field_validator("role", mode="before")
+    @classmethod
+    def normalize_role(cls, v: UserRole | str) -> UserRole:
+        if isinstance(v, str):
+            return UserRole(v.lower())
+        return v
     active: bool = Field(default=True, description="Whether user is active")
 
     @field_validator("username")

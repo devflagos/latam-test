@@ -16,6 +16,14 @@ COPY app/ ./app/
 
 RUN uv sync --frozen --no-dev
 
+ENV LOG_LEVEL="INFO"
+ENV ENV="prod"
+ENV DATABASE_HOST="localhost"
+ENV DATABASE_PORT="5432"
+ENV DATABASE_USER="postgres"
+ENV DATABASE_PASSWORD=""
+ENV DATABASE_NAME="test_latam"
+
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
 
 USER appuser
